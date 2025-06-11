@@ -1,0 +1,63 @@
+# Development configuration - Production would use:
+# - Separate .env.prod
+# - Proper secret management
+# - Restricted ports
+
+services:
+  backend:
+    build: .
+    ports:
+      - "3000:3000"
+      - "9229:9229" # Debug port
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - CHOKIDAR_USEPOLLING=${CHOKIDAR_USEPOLLING}
+      - SMTP_HOST=${SMTP_HOST}  # or your Hostinger SMTP host
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}  # Your Hostinger email
+      - SMTP_PASSWORD=${SMTP_PASSWORD} # Hostinger SMTP password
+      - EMAIL_FROM_NAME=${EMAIL_FROM_NAME}
+      - TZ=${TZ}
+    volumes:
+      - ./:/usr/src/app # Bind mount for live development
+      - ./logs:/backend/logs # Dedicated log volume
+      - /usr/src/app/node_modules # Isolate node_modules
+    command: npm run dev # Override to use nodemon
+    depends_on:
+      db:
+        condition: service_healthy  # Ensures Postgres starts first
+    stdin_open: true
+    tty: true
+
+# Postgres Database (AWS RDS-like configuration)
+  db:
+    image: postgres:15-alpine  # Lightweight but full-featured
+    environment:
+      POSTGRES_USER: ${POSTGRES_SUPERUSER}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERPASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - "5432:5432"  # Exposed for local tools (PgAdmin, etc.)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistent storage
+      - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s  # ← Critical addition!
+volumes:
+  postgres_data:  # Named volume survives container restarts

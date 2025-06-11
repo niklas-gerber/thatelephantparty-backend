@@ -1,0 +1,2 @@
+logs/*.log           # Ignore all non-rotated logs  
+!logs/*-%DATE%.log   # Keep rotated logs (DATED files)  

@@ -1,0 +1,6 @@
+.env
+node_modules/
+postgres_data/
+logs/
+private/uploads/payslips
+public/posters
