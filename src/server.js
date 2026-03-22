@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const cors = require('cors'); // HINZUGEFÜGT
 const { sequelize, testConnection } = require('./db');
 const app = express();
 const initAdmin = require('./scripts/initAdmin');
@@ -10,8 +11,17 @@ app.set('trust proxy', 1);
 app.use(cookieParser());
 app.use(express.json());
 
-// helmet Default XSS Protection
-app.use(helmet());
+// CORS Konfiguration (Zukunftssicher für Prod & Dev)
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  credentials: true
+}));
+
+// helmet mit Cross-Origin Erlaubnis für Bilder
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false
+}));
 
 // Rate Limiters
 const apiLimiter = require('./middleware/apiLimiter');

@@ -12,6 +12,7 @@ exports.getAllPublicEvents = async (req, res) => {
       'id',
       'title',
       'display_date',
+      'start_date',
       'venue_name',
       'venue_address',
       'event_time',
@@ -36,6 +37,7 @@ exports.getPublicEvent = async (req, res) => {
       'id',
       'title',
       'display_date',
+      'start_date',
       'venue_name',
       'venue_address',
       'event_time',
@@ -77,8 +79,8 @@ exports.createEvent = async (req, res) => {
 
     // Handle file upload if present
     if (req.file) {
-      posterUrl = await storage.savePrivateFile(req.file);
-      req.body.poster_image_url = posterUrl; // Add URL to create payload
+      posterUrl = await storage.savePublicFile(req.file); // Geändert von savePrivateFile
+      req.body.poster_image_url = posterUrl;
     }
 
     // Create event
@@ -107,7 +109,7 @@ exports.updateEvent = async (req, res) => {
 
     // Handle new file upload
     if (req.file) {
-      newPosterUrl = await storage.savePrivateFile(req.file);
+      newPosterUrl = await storage.savePublicFile(req.file); // Geändert von savePrivateFile
       req.body.poster_image_url = newPosterUrl;
     }
 

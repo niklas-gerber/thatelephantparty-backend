@@ -24,9 +24,7 @@ module.exports = {
         max_tickets: 150,
         ticket_deadline: new Date('2024-12-30T23:59:59Z'),
         is_active: true,
-        start_date: new Date('2024-12-31'),
-        created_at: new Date(),
-        updated_at: new Date()
+        start_date: new Date('2024-12-31')
       },
       // 2. Past event (inactive)
       {
@@ -44,9 +42,7 @@ module.exports = {
         ticket_deadline: new Date('2024-06-10T23:59:59Z'),
         is_active: false,
         inactive_message: "Sold out! Join waitlist at contact@example.com",
-        start_date: new Date('2024-06-15'),
-        created_at: new Date(),
-        updated_at: new Date()
+        start_date: new Date('2024-06-15')
       },
       // 3. Active event without bundles
       {
@@ -63,9 +59,7 @@ module.exports = {
         max_tickets: 80,
         ticket_deadline: new Date('2024-07-18T23:59:59Z'),
         is_active: true,
-        start_date: new Date('2024-07-20'),
-        created_at: new Date(),
-        updated_at: new Date()
+        start_date: new Date('2024-07-20')
       }
     ], {}, { schema: 'app' });
   },

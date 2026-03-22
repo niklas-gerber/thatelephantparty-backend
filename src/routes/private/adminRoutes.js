@@ -14,7 +14,7 @@ const upload = require('../../middleware/upload');
 router.post(
   '/events',
   protect,  
-  upload.single('poster'), 
+  upload.single('file'), 
   validate(createEventSchema),
   catchAsync(eventController.createEvent)
 );
@@ -37,7 +37,7 @@ router.get(
 router.patch(
   '/events/:id',
   protect,
-  upload.single('poster'), // File processing first
+  upload.single('file'), // File processing first
   (req, res, next) => {
     // Skip validation if only a file was uploaded
     if (req.file && Object.keys(req.body).length === 0) {
@@ -62,7 +62,7 @@ router.get('/tickets', protect, catchAsync(ticketController.getAllTickets));
 router.patch(
   '/tickets/:id',
   protect,
-  upload.single('payslip'), // Reuse payslip upload middleware
+  upload.single('file'), // Reuse payslip upload middleware
   catchAsync(ticketController.updateTicket)
 );
 
