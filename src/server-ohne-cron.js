@@ -5,7 +5,6 @@ const { sequelize, testConnection } = require('./db');
 const app = express();
 const initAdmin = require('./scripts/initAdmin');
 const helmet = require('helmet');
-const { handler: checkDeadlines } = require('../lambdas/check-event-deadlines');
 app.set('trust proxy', 1);
 
 // Core Middleware
@@ -63,36 +62,13 @@ app.use(errorHandler); // Catches all errors
 
 // AWS-style startup sequence 
 async function startServer() {
-  try {
-    await testConnection();
-    await sequelize.sync({ alter: true }); // Creates tables if missing - CHANGE FOR PRODUCTION
-    await initAdmin(); // After DB sync
-    console.log('Database tables synchronized + admin initialized');
-    
-    app.listen(3000, () => {
-      console.log('Server + DB ready on port 3000');
-      
-      // --- HINZUFÜGEN: Automatischer Deadline-Check alle 5 Minuten ---
-      console.log('[CRON] Starting automatic deadline check (every 1 minute)...');
-      
-      setInterval(async () => {
-        try {
-          const result = await checkDeadlines();
-          // Optional: Nur loggen, wenn wirklich etwas deaktiviert wurde
-          const data = JSON.parse(result.body);
-          if (data.updatedCount > 0) {
-            console.log(`[CRON] Auto-Check: ${data.updatedCount} events deactivated.`);
-          }
-        } catch (err) {
-          console.error('[CRON] Error during auto-deadline-check:', err.message);
-        }
-      }, 1 * 60 * 1000); // 5 Minuten in Millisekunden
-      // ---------------------------------------------------------------
-    });
-  } catch (err) {
-    console.error('Unable to start server:', err);
-    process.exit(1);
-  }
+  await testConnection();
+  await sequelize.sync({ alter: true }); // Creates tables if missing - CHANGE FOR PRODUCTION
+  await initAdmin(); // After DB sync
+  console.log('Database tables synchronized + admin initialized');
+  app.listen(3000, () => {
+    console.log('Server + DB ready on port 3000');
+  });
 }
 
 startServer();

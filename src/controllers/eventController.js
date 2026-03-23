@@ -7,7 +7,6 @@ const PDFDocument = require('pdfkit');
 // GET /api/v1/public/events (Public access - only public fields)
 exports.getAllPublicEvents = async (req, res) => {
   const events = await Event.findAll({
-    where: { is_active: true },
     attributes: [
       'id',
       'title',
@@ -57,7 +56,6 @@ exports.getPublicEvent = async (req, res) => {
 // GET all Events with full info for Admin
 exports.getAllEvents = async (req, res) => {
   const events = await Event.findAll({
-    where: { is_active: true },  // Only show active events
     order: [['start_date', 'ASC']]  // Order by date
   });
   res.json(events);

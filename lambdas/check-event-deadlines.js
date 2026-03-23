@@ -1,33 +1,41 @@
+// lambdas/check-event-deadlines.js komplett ersetzen:
+
 const { Event } = require('../src/models');
-const { sequelize } = require('../src/db');
 const { Op } = require('sequelize');
 
-/*
- * Automatically deactivates events whose ticket deadlines have passed
- * Runs on a schedule (e.g., daily via AWS Lambda)
- */
 exports.handler = async () => {
-    // Set timezone (works in both Lambda and local)
+    // Erzwinge Manila-Zeit für den Vergleich
     process.env.TZ = 'Asia/Manila';
-    
     const now = new Date();
-    console.log(`Current PH Time: ${now}`);
     
-    const result = await Event.update(
-        { is_active: false },
-        {
-            where: {
-                is_active: true,
-                ticket_deadline: { [Op.lt]: now }
+    console.log(`[DEADLINE-CHECK] Start: ${now.toISOString()} (PH-Time: ${now.toString()})`);
+
+    try {
+        const result = await Event.update(
+            { is_active: false },
+            {
+                where: {
+                    is_active: true,
+                    ticket_deadline: { 
+                        [Op.lt]: now, // Kleiner als "jetzt"
+                        [Op.ne]: null // Nicht null
+                    }
+                }
             }
-        }
-    );
-    
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            updatedCount: result[0],
-            currentTime: now.toISOString()
-        })
-    };
+        );
+
+        const updatedCount = result[0];
+        console.log(`[DEADLINE-CHECK] Success: ${updatedCount} events deactivated.`);
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                updatedCount,
+                currentTime: now.toISOString()
+            })
+        };
+    } catch (error) {
+        console.error(`[DEADLINE-CHECK] Error:`, error);
+        throw error;
+    }
 };
