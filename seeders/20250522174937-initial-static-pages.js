@@ -7,12 +7,12 @@ module.exports = {
     await queryInterface.bulkInsert({ tableName: 'static_pages', schema: 'app' }, [
       {
         name: 'about',
-        content: '<h1>About Us</h1><p>We love elephants!</p>',
+        content: 'ELEPHANT is a nomadic queer techno dance party based in Manila, organized by a collective of LGBTQIA+ artists, DJs, activists and performers. ELEPHANT advocates for safer spaces for the community and equitable pay among artists.',
         last_updated: new Date(),
       },
       {
         name: 'contact',
-        content: '<h1>Contact</h1><p>Email: party@elephants.com</p>',
+        content: 'For ticket informations, email us at elephantpartypreregistration@gmail.com or DM @thatelephantparty/@lancenavasca on instagram. Elephant Party is always looking for volunteers, if you are queer and know anything about production, send us a DM @thatelephantparty on instagram.',
         last_updated: new Date(),
       },
     ], {}); // Target schema

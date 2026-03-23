@@ -9,8 +9,11 @@ const { sendTicketConfirmation } = require('../services/mailService');
 exports.createTicketPurchase = async (req, res) => {
     let payslipUrl = null;
     try {
-        const { id: event_id } = req.params;
-        const { quantity, buyer_name, phone, email, reference_number, attendees } = req.body;
+        // ID flexibel aus URL oder Body holen
+        const event_id = req.params.id || req.body.event_id;
+        
+        // WICHTIG: 'let' statt 'const', damit wir attendees später parsen können
+        let { quantity, buyer_name, phone, email, reference_number, attendees } = req.body;
 
         // Handle case where attendees comes as stringified JSON
         if (typeof attendees === 'string') {
@@ -242,7 +245,7 @@ exports.getEventAttendees = async (req, res) => {
       model: TicketPurchase,
       as: 'ticketPurchase', 
       where: { event_id: eventId },
-      attributes: ['buer_name'], // Only fetch buyer_name for grouping
+      attributes: ['buyer_name'], // Only fetch buyer_name for grouping
       required: true
     }],
     attributes: ['id', 'name', 'checked_in'], // Only necessary fields

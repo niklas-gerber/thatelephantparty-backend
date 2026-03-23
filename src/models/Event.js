@@ -96,4 +96,12 @@ walk_in_gcash_count: {
   underscored: true   // Ensure snake_case fields
 });
 
+Event.associate = function(models) {
+  Event.hasMany(models.TicketPurchase, {
+    foreignKey: 'event_id',
+    as: 'tickets',
+    onDelete: 'CASCADE' // Löscht Tickets, wenn Event gelöscht wird
+  });
+};
+
 module.exports = Event;

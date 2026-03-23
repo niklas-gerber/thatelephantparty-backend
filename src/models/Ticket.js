@@ -57,7 +57,8 @@ const TicketPurchase = sequelize.define('TicketPurchase', {
 TicketPurchase.associate = function(models) {
   TicketPurchase.hasMany(models.Attendee, {
     foreignKey: 'ticket_purchase_id',
-    as: 'attendees'
+    as: 'attendees',
+    onDelete: 'CASCADE' // Löscht Teilnehmer, wenn Ticket gelöscht wird
   });
 };
 

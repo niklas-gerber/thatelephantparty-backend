@@ -4,6 +4,7 @@ const TicketPurchase = require('./Ticket');
 const Attendee = require('./Attendee');
 
 // Register associations
+Event.associate({ TicketPurchase });
 TicketPurchase.associate({ Attendee });
 Attendee.associate({ TicketPurchase });
 

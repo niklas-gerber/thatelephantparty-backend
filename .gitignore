@@ -4,3 +4,4 @@ postgres_data/
 logs/
 private/uploads/payslips
 public/posters
+seeders/*-legacy-events.js

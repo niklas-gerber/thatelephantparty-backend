@@ -58,6 +58,14 @@ router.delete(
 // GET all Tickets
 router.get('/tickets', protect, catchAsync(ticketController.getAllTickets));
 
+// POST Create Ticket (Admin-Manuell)
+router.post(
+  '/tickets',
+  protect,
+  upload.single('file'), // Wichtig: Feldname muss 'payslip' sein
+  catchAsync(ticketController.createTicketPurchase)
+);
+
 // PATCH /admin/tickets/:id (update ticket or payslip)
 router.patch(
   '/tickets/:id',
