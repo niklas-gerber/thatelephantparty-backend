@@ -21,7 +21,8 @@ router.post('/login', authLimiter, catchAsync(async (req, res) => {
   
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
+    sameSite: 'none',
     maxAge: 3600000 // 1 hour
   });
 

@@ -14,7 +14,8 @@ app.use(express.json());
 
 // CORS Konfiguration (Zukunftssicher für Prod & Dev)
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  // Wenn FRONTEND_URL existiert, teile den String an den Kommas auf, um ein Array zu erstellen. Sonst Fallback auf localhost.
+  origin: process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : 'http://localhost:3001',
   credentials: true
 }));
 
