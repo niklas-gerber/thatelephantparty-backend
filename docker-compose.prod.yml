@@ -2,9 +2,9 @@ services:
   backend:
     build: .
     restart: always
-    ports:
-      # Nur lokal gebunden! Traffic kommt über Nginx.
-      - "127.0.0.1:3000:3000"
+    # WICHTIG: 'ports' durch 'expose' ersetzt!
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=${FRONTEND_URL}
@@ -12,7 +12,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=db # Verweist intern auf den Datenbank-Container
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -23,15 +23,21 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - EMAIL_FROM_NAME=${EMAIL_FROM_NAME}
       - TZ=${TZ}
+      # NGINX Proxy Variablen:
+      - VIRTUAL_HOST=api.thatelephantparty.com
+      - LETSENCRYPT_HOST=api.thatelephantparty.com
+      - VIRTUAL_PORT=3000
     volumes:
-      # NUR die Logs werden als Volume gemountet, der Code ist fest im Image.
-      - ./logs:/backend/logs 
+      - ./logs:/backend/logs
     depends_on:
       db:
-        condition: service_healthy 
+        condition: service_healthy
+    networks:
+      - default
+      - nginx-proxy
 
   db:
-    image: postgres:15-alpine 
+    image: postgres:15-alpine
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_SUPERUSER}
@@ -40,10 +46,11 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    ports:
-      - "127.0.0.1:5432:5432" 
+    # WICHTIG: 'ports' durch 'expose' ersetzt! Datenbank ist sicher!
+    expose:
+      - "5432" 
     volumes:
-      - postgres_data:/var/lib/postgresql/data 
+      - postgres_data:/var/lib/postgresql/data
       - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
     env_file: .env
     healthcheck:
@@ -51,7 +58,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s 
+      start_period: 10s
 
 volumes:
   postgres_data:
+
+networks:
+  nginx-proxy:
+    external: true
